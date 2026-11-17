@@ -110,7 +110,35 @@
     </div>
   </div>
 
-  <script type="module">
+  <script type="module"><script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://envpdufjfclpnqygxrfl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_qfHG3ox5ILnRs4e2g8-fsA_Z-xHZSdl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ---> ĐẶT ĐOẠN MÃ NÀY VÀO ĐÂY <---
+    async function processDailyAttendance() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`; 
+      const timeString = now.toISOString();
+
+      // Ghi nhận điểm danh dùng đúng cột visit_date
+      await supabase.from('attendance').upsert([
+        { visit_date: dateString, visited_at: timeString }
+      ], { onConflict: 'visit_date' });
+
+      const { data } = await supabase.from('attendance').select('*');
+      const totalChecked = data ? data.length : 1;
+      document.getElementById("streakCount").textContent = totalChecked;
+    }
+
+    // Các đoạn code khác giữ nguyên ở phía dưới...
+    processDailyAttendance();
+  </script>
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     const SUPABASE_URL = 'https://envpdufjfclpnqygxrfl.supabase.co';
