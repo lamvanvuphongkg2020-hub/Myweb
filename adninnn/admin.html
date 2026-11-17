@@ -1,0 +1,319 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Daily Wishes ♡</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --pink: #f7a9c4;
+      --deep: #c95f8a;
+      --ink: #5c3547;
+      --bg: #fff5f8;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --font-heading: "Playfair Display", Georgia, serif;
+      --font-body: "Be Vietnam Pro", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: linear-gradient(135deg, #fff1f6 0%, #ffe0ec 50%, #fceafa 100%);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      width: min(100%, 760px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      text-align: center;
+      padding: 20px 0;
+    }
+    header h1 {
+      font-family: var(--font-heading);
+      color: #c45f89;
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+    header p {
+      margin: 0;
+      color: #a77c90;
+      font-size: 13px;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 16px 40px rgba(190, 100, 140, 0.12);
+      backdrop-filter: blur(10px);
+    }
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      color: var(--deep);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .stat-box {
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #f5dce6;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--deep);
+      margin-top: 4px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #a77c90;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-seen { background: #e8f5e9; color: #2e7d32; }
+    .status-unseen { background: #ffebee; color: #c62828; }
+    .status-penalty { background: #ffebee; color: #d32f2f; font-weight: bold; }
+    .status-pass { background: #e3f2fd; color: #1976d2; font-weight: bold; }
+
+    .list-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .item-card {
+      background: white;
+      border: 1px solid #f5dce6;
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #b88ba0;
+      margin-bottom: 6px;
+      border-bottom: 1px dashed #f5dce6;
+      padding-bottom: 6px;
+    }
+    .item-body {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    button {
+      border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer;
+      font-family: var(--font-body); font-size: 12px; font-weight: 600;
+      transition: transform .2s, box-shadow .2s;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(201,95,138,.2); }
+    .btn-danger { background: #fff0f3; color: #b84e70; border: 1px solid #f5c2d3; }
+
+    .actions-bar {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #c49ba9;
+      font-size: 13px;
+      padding: 20px 0;
+    }
+
+    .setup-guide {
+      background: rgba(255,255,255,0.6);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 12px;
+      color: #8c5b70;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Bảng Điều Khiển Admin 👑</h1>
+      <p>Theo dõi xem Lời Chúc, Tâm Tư & Kế Hoạch Tuần của người ấy (Đồng bộ Realtime từ Supabase)</p>
+    </header>
+
+    <div class="card">
+      <h2>Trạng Thái Tháng & Điểm Danh 📌</h2>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-label">Hôm nay mở web chưa?</div>
+          <div id="todayStatus" style="margin-top:6px;">Checking...</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Điểm danh tích lũy</div>
+          <div class="stat-number" id="streakCount">0 ngày</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Trạng thái tháng</div>
+          <div id="monthStatus" style="margin-top:6px;">Đang cập nhật...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💬 Tâm Tư Nguyện Vọng</h2>
+      <div id="notesList" class="list-box"></div>
+    </div>
+
+    <div class="card">
+      <h2>📅 Kế Hoạch Trong Tuần</h2>
+      <div id="plansList" class="list-box"></div>
+      <div class="actions-bar">
+        <button class="btn-danger" id="clearDataBtn">🗑 Xóa Toàn Bộ Tâm Tư</button>
+      </div>
+    </div>
+
+    <div class="setup-guide">
+      💡 <strong>Đồng bộ tự động:</strong> Mọi thao tác điểm danh hay nhắn tin từ điện thoại sẽ được cập nhật thẳng lên đây theo thời gian thực nhờ Supabase Realtime!
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://envpdufjfclpnqygxrfl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_qfHG3ox5ILnRs4e2g8-fsA_Z-xHZSdl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const recipientName = "Bé Yêu";
+
+    async function loadAdminDashboard() {
+      const now = new Date();
+      const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+
+      // 1. Lấy dữ liệu điểm danh từ Supabase
+      const { data: attendanceData } = await supabase.from('attendance').select('*');
+      const todayChecked = attendanceData ? attendanceData.some(item => item.date === dateStr) : false;
+      const totalChecked = attendanceData ? attendanceData.length : 0;
+      
+      const todayStatusEl = document.getElementById("todayStatus");
+      if (todayChecked) {
+        todayStatusEl.innerHTML = `<span class="badge-status status-seen">✓ Đã Xem Hôm Nay</span>`;
+      } else {
+        todayStatusEl.innerHTML = `<span class="badge-status status-unseen">✕ Chưa Xem</span>`;
+      }
+
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      document.getElementById("streakCount").textContent = `${totalChecked}/${lastDayOfMonth} ngày`;
+
+      const monthStatusEl = document.getElementById("monthStatus");
+      if (now.getDate() === lastDayOfMonth || totalChecked >= lastDayOfMonth) {
+        monthStatusEl.innerHTML = totalChecked >= lastDayOfMonth ? `<span class="badge-status status-pass">✨ Hoàn thành xuất sắc!</span>` : `<span class="badge-status status-penalty">⚠️ BỊ PHẠT!</span>`;
+      } else {
+        monthStatusEl.innerHTML = `<span class="badge-status" style="background:#fff3e0; color:#e65100;">⏳ Đang diễn ra (${totalChecked}/${lastDayOfMonth})</span>`;
+      }
+
+      // 2. Lấy danh sách Tâm tư từ Supabase
+      const { data: notesData } = await supabase.from('notes').select('*').order('id', { ascending: false });
+      const notesListEl = document.getElementById("notesList");
+      notesListEl.replaceChildren();
+
+      if (!notesData || notesData.length === 0) {
+        notesListEl.innerHTML = `<div class="empty-state">Chưa có tâm sự mới nào được gửi.</div>`;
+      } else {
+        notesData.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div class="item-header">
+              <span>👤 ${recipientName}</span>
+              <span>🕒 ${item.time || ''}</span>
+            </div>
+            <div class="item-body">${escapeHtml(item.content)}</div>
+          `;
+          notesListEl.appendChild(card);
+        });
+      }
+
+      // 3. Lấy Kế hoạch tuần từ Supabase
+      const { data: plansData } = await supabase.from('weekly_plans').select('*');
+      const plansListEl = document.getElementById("plansList");
+      plansListEl.replaceChildren();
+
+      if (!plansData || plansData.length === 0) {
+        plansListEl.innerHTML = `<div class="empty-state">Chưa có kế hoạch tuần nào.</div>`;
+      } else {
+        plansData.forEach(plan => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          const statusTag = plan.done ? `<span style="color:#2e7d32; font-weight:bold;">[Đã Xong]</span>` : `<span style="color:#c62828;">[Chưa làm]</span>`;
+          card.innerHTML = `
+            <div class="item-body">
+              ${statusTag} <strong>${escapeHtml(plan.title)}</strong>
+            </div>
+          `;
+          plansListEl.appendChild(card);
+        });
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
+    }
+
+    // Xóa tất cả tâm tư
+    document.getElementById("clearDataBtn").addEventListener("click", async () => {
+      if (confirm("Bạn có muốn xóa toàn bộ lịch sử tâm sự trên đám mây không?")) {
+        await supabase.from('notes').delete().neq('id', 0); // Xóa hết bản ghi
+        loadAdminDashboard();
+      }
+    });
+
+    // Lắng nghe thay đổi Realtime (Tự động cập nhật ngay khi điện thoại gửi dữ liệu)
+    supabase.channel('public:notes')
+      .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+        loadAdminDashboard();
+      })
+      .subscribe();
+
+    loadAdminDashboard();
+  </script>
+</body>
+</html>
+```[cite: 5]
+
+---
